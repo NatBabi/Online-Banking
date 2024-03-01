@@ -1,0 +1,231 @@
+Create database ASTUBankingDB;
+use ASTUBankingDB;
+drop database ASTUBankingDB;
+
+
+CREATE TABLE Users (
+  user_id VARCHAR(20) PRIMARY KEY,
+  full_name VARCHAR(70) NOT NULL,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  account_number VARCHAR(20) NOT NULL,
+  role ENUM('Student', 'Staff') NOT NULL, 
+  registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_active BOOLEAN DEFAULT false,
+  activation_code VARCHAR(255),
+  email VARCHAR(255) NOT NULL,
+  phone_number VARCHAR(20) NOT NULL
+);
+DROP TABLE Users;
+INSERT INTO Users (user_id, full_name,  username, password, account_number, role, is_active, activation_code,  email, phone_number)
+VALUES ('U200', 'Bethelehum Girum', 'Beti', 'pawd123', '5559985310', 'Student', 1, '7823', 'natnaeltilahun@gmail.com', '251-967-033-862'),
+       ('U300', 'Kerob Gebru','Lala', 'paxs156', '5557110030', 'Student', 1, '1345',  'natnaelNegusea@gmail.com', '251-900-433-879'),
+       ('U400', 'Henok Asfaw', 'Bob', 'pio004', '5550410023', 'Student', 1, '2356', 'natnaelNegash@gmail.com', '251-910-403-810'),
+       ('U101', 'John Doe', 'johndoe', 'pass123', '5551234567', 'Staff', 1, '9012', 'johndoe@example.com', '123-456-7890'),
+       ('U102', 'Jane Smith', 'janesmith', 'pass456', '5559876543', 'Student', 1, '2504',  'janesmith@example.com', '987-654-3210'),
+       ('U103', 'Alice Johnson', 'alicejohnson', 'pass789', '5551112222', 'Staff', 1, '1357', 'alicejohnson@example.com', '111-222-3333'),
+       ('U104', 'Bob Williams', 'bobwilliams', 'passABC', '5553334444', 'Staff', 1, '3459', 'bobwilliams@example.com', '333-444-5555');
+
+
+DROP TABLE Users;
+
+
+
+
+CREATE TABLE Students (
+  Student_id INT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  Gender ENUM('F','M') NOT NULL,
+  Entry_year DATE NOT NULL,
+  year_of_study INT NOT NULL,
+  Department VARCHAR(25) NOT NULL,
+  status ENUM('BSc Degree', 'Masters') NOT NULL,
+  cost_share DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+DROP TABLE Students;
+
+CREATE TABLE Employees (
+  Employee_id INT PRIMARY KEY,
+  user_id VARCHAR(20),
+  Full_Name VARCHAR(25),
+  Gender VARCHAR(25),
+  Department VARCHAR(25),
+  role ENUM('teacher', 'staff') NOT NULL,
+  Salary INT,
+  Year_of_Service INT,
+  Address VARCHAR(30),
+  phone_number VARCHAR(20) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+DROP TABLE Employees;
+
+
+	   
+
+-- Create ASTU Bank Accounts Table
+CREATE TABLE AstuBankAccounts (
+  astu_accountid INT PRIMARY KEY AUTO_INCREMENT,
+  user_id VARCHAR(20) NOT NULL,
+  account_number VARCHAR(20) NOT NULL,
+  account_balance DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+INSERT INTO AstuBankAccounts (user_id, account_number, account_balance)
+VALUES ('U101', '5551234567', 50900.90 ),
+       ('U102','5559876543', 2439.0),
+       ('U103','5551112222', 34968.24 ),
+       ('U104', '5553334444', 210.9 ),
+       ('U200', '5559985310', 2200.0 ),
+       ('U300', '5557110030', 11000.0 ),
+       ('U400', '5550410023', 20920.0 );
+
+
+U
+-- Create Other Bank Accounts Table
+CREATE TABLE OtherBankAccounts (
+  others_accountid INT PRIMARY KEY AUTO_INCREMENT,
+  otheruser_id VARCHAR(20) NOT NULL,
+  bank_name VARCHAR(100) NOT NULL,
+  account_number VARCHAR(20) NOT NULL,
+  account_balance DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE AstuBankAccounts;
+DROP TABLE OtherBankAccounts;
+
+-- Sample Data Insertion for Other Bank Accounts
+INSERT INTO OtherBankAccounts (otheruser_id, bank_name, account_number, account_balance)
+VALUES ('U181', 'Abisinya Bank', 'AB001', 3000.00),
+       ('U281', 'Awash Bank', 'AW002', 6000.00),
+       ('U381', 'Commerical Bank', 'CE003', 8000.00),
+       ('U481', 'Ahadu Bank', 'AH004', 1500.00);
+
+
+CREATE TABLE Transactions (
+  Trans_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  account_numberFrom VARCHAR(20) NOT NULL, 
+  account_numberTo VARCHAR(20) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  transaction_type ENUM('withdraw', 'deposit') NOT NULL,
+  description VARCHAR(200) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+DROP TABLE Transactions;
+
+
+CREATE TABLE LoanRequests (
+  loan_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  loan_amount DECIMAL(10, 2) NOT NULL,
+  loan_type ENUM('day','week','month') NOT NULL,
+  application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('approved', 'provided') NOT NULL,
+  loan_reason VARCHAR(70) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+DROP TABLE LoanRequests;
+
+INSERT INTO LoanRequests (user_id, loan_amount, loan_type, status, loan_reason)
+VALUES ('U101', 2000.00, 'day', 'provided', 'Textbook expenses'),
+       ('U200', 7000.00, 'week', 'approved', 'Scholarship study abroad expenses'),
+       ('U300', 32000.00, 'month', 'provided', 'Emergency medical expenses'),
+       ('U400', 5000.00, 'week', 'provided', 'Conference travel funding'),
+       ('U101', 2000.00, 'day', 'approved', 'Laptop Service expenses');
+
+
+CREATE TABLE LoanRepayments (
+  repay_id INT AUTO_INCREMENT PRIMARY KEY,
+  loan_id INT NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  repayment_amount DECIMAL(10, 2) NOT NULL,
+  repayment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (loan_id) REFERENCES LoanRequests(loan_id),
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+DROP TABLE LoanRepayments;
+
+CREATE TABLE Loan_History (
+  loanTransactionid INT AUTO_INCREMENT PRIMARY KEY,
+  loan_id INT NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  loan_amount DECIMAL(10, 2) NOT NULL,
+  loan_type ENUM('day', 'week', 'month') NOT NULL,
+  application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('pending', 'rejected', 'provided') NOT NULL,
+  loan_reason VARCHAR(70) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+DROP TABLE Loan_History;
+
+
+	
+DROP TABLE LoanRepayments;
+
+-- Create OtherServices Table
+CREATE TABLE Services (
+  service_id INT AUTO_INCREMENT PRIMARY KEY,
+  service_name VARCHAR(255) NOT NULL,
+  service_description TEXT,
+  service_type ENUM('on-campus','off-campus', 'registrar') NOT NULL,
+  service_status ENUM('active', 'inactive', 'suspended') DEFAULT 'active'
+);
+
+
+DROP TABLE Services;
+INSERT INTO Services (service_name, service_description, service_type, service_status)
+VALUES ('Transcript', 'Request an official transcript of academic records.', 'registrar', 'active'),
+		('Withdrawal', 'Formally withdraw from a course or the university.', 'registrar', 'active'),
+		('Lost ID Card', 'Replace a lost or damaged student identification card.', 'registrar', 'active'),
+		('Cafeterias', 'On-campus dining facilities.', 'on-campus', 'active'),
+		('Retail Store', 'On-campus store for purchasing various items.', 'on-campus', 'active'),
+		('Fitness Center', 'On-campus gym and fitness facilities.', 'on-campus', 'active'),
+		('Stationary', 'On-campus stationery store for purchasing office and study supplies.', 'on-campus', 'active'),
+		('Qefira delivery', 'Off-campus food delivery service.', 'off-campus', 'active'),
+		('WEGO RIDE', 'Off-campus transportation services such as shuttle or bus.', 'off-campus', 'active'),
+		('Entertainment', 'Off-campus entertainment activities such as movie theaters or amusement parks.', 'off-campus', 'active');
+
+CREATE TABLE Payments (
+  payment_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  service_id INT NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id),
+  FOREIGN KEY (service_id) REFERENCES Services(service_id)
+);
+DROP TABLE Payments;
+
+CREATE TABLE SalaryDetails (
+  salary_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  salary DECIMAL(10, 2) NOT NULL,
+  salary_date DATE NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE SupportTickets (
+  ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(20) NOT NULL,
+  ticket_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ticket_subject VARCHAR(100) NOT NULL,
+  ticket_description TEXT NOT NULL,
+  ticket_status ENUM('open', 'closed') NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE SupportReplies (
+  replie_id INT AUTO_INCREMENT PRIMARY KEY,
+  ticket_id INT NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  reply_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reply_message TEXT NOT NULL,
+  FOREIGN KEY (ticket_id) REFERENCES SupportTickets(replie_id),
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
